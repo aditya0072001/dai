@@ -6,3 +6,4 @@ cleantxty
 checkify
 openai
 xlsxwriter
+nltk
