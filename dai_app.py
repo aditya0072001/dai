@@ -2,26 +2,61 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from io import BytesIO
-from seabornai import generate_graph, set_openai_api_key
 from checkify.code_checker import check_code
 from cleantxty import clean
+import seaborn as sns
+import matplotlib.pyplot as plt
 import openai
 
-# Set OpenAI API key
+
+# Set OpenAI API Key
+def set_openai_api_key(api_key):
+    openai.api_key = api_key
+
+
+# Generate Graph Function
+def generate_graph(data, prompt, style="whitegrid", size=(6, 4)):
+    if not openai.api_key:
+        raise ValueError("OpenAI API key not set. Please use `set_openai_api_key` function to set the API key.")
+
+    # Generate text response from OpenAI
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        max_tokens=100
+    )
+    generated_text = response.choices[0].text.strip()
+
+    # Ensure dataframe has sufficient columns for plotting
+    if len(data.columns) < 2:
+        raise ValueError("Dataset must have at least two columns for plotting.")
+
+    # Plotting logic
+    sns.set(style=style)
+    sns.set(rc={"figure.figsize": size})
+    sns.barplot(data=data, x=data.columns[0], y=data.columns[1])
+    return plt.gcf()  # Return the current figure for rendering in Streamlit
+
+
+# Streamlit App
 API_KEY = st.text_input("Enter your OpenAI API Key:", type="password")
 if API_KEY:
     set_openai_api_key(API_KEY)
-    openai.api_key = API_KEY
 
 st.title("D.AI (Data + AI)")
 st.write("Analyze your datasets with ease using **D.AI**. Choose between traditional manual methods and cutting-edge AI-powered insights.")
 uploaded_files = st.file_uploader(
     "Upload your dataset (CSV, Excel, JSON, or TXT)", accept_multiple_files=True)
 
-# Allow users to choose analysis type
 analysis_type = st.radio("Select Your Analysis Mode:", [
                          "Manual Analysis", "AI-Powered Analysis"])
+st.title("D.AI (Data + AI)")
+st.write("Analyze your datasets with ease using **D.AI**. Choose between traditional manual methods and cutting-edge AI-powered insights.")
+uploaded_files = st.file_uploader(
+    "Upload your dataset (CSV, Excel, JSON, or TXT)", accept_multiple_files=True)
 
+analysis_type = st.radio("Select Your Analysis Mode:", [
+                         "Manual Analysis", "AI-Powered Analysis"])
 
 if uploaded_files:
     for uploaded_file in uploaded_files:
@@ -29,25 +64,29 @@ if uploaded_files:
         st.write(f"Processing file: {uploaded_file.name}")
 
         # Load the file based on extension
-        if file_extension == 'csv':
-            dataframe = pd.read_csv(uploaded_file)
-        elif file_extension in ['xls', 'xlsx']:
-            dataframe = pd.read_excel(uploaded_file)
-        elif file_extension == 'json':
-            dataframe = pd.read_json(uploaded_file)
-        elif file_extension == 'txt':
-            with open(uploaded_file, 'r') as f:
-                text_data = f.read()
-                st.write("Text file detected. Clean the text using cleantxty:")
-                st.text_area("Raw Text", text_data)
-                cleaned_text = clean(text_data)
-                st.text_area("Cleaned Text", cleaned_text)
-            continue
-        else:
-            st.error("Unsupported file format!")
+        try:
+            if file_extension == 'csv':
+                dataframe = pd.read_csv(uploaded_file)
+            elif file_extension in ['xls', 'xlsx']:
+                dataframe = pd.read_excel(uploaded_file)
+            elif file_extension == 'json':
+                dataframe = pd.read_json(uploaded_file)
+            elif file_extension == 'txt':
+                with open(uploaded_file, 'r') as f:
+                    text_data = f.read()
+                    st.write("Text file detected. Clean the text using cleantxty:")
+                    st.text_area("Raw Text", text_data)
+                    cleaned_text = clean(text_data)
+                    st.text_area("Cleaned Text", cleaned_text)
+                continue
+            else:
+                st.error("Unsupported file format!")
+                continue
+        except Exception as e:
+            st.error(f"Error loading file: {e}")
             continue
 
-        # Display file stats and overview
+        # Display file stats and preview
         st.write(f"**Shape:** {dataframe.shape}")
         st.write("**Data Preview:**")
         st.dataframe(dataframe)
@@ -111,16 +150,29 @@ if uploaded_files:
             st.subheader("AI-Powered Analysis")
 
             # Generate Graphs Using SeabornAI
-            if st.checkbox("Generate Graphs Using AI (SeabornAI)"):
-                prompt = st.text_input(
-                    "Describe the graph you want to generate:")
+            if st.checkbox("Generate Graphs Using AI"):
+                prompt = st.text_input("Describe the graph you want to generate:")
                 if st.button("Generate Graph"):
                     try:
-                        graph = generate_graph(
-                            dataframe.to_dict('list'), prompt)
+                        graph = generate_graph(dataframe, prompt)
                         st.pyplot(graph)
                     except Exception as e:
                         st.error(f"Error generating graph: {e}")
+
+            # Generate AI Summary
+            if st.checkbox("Generate AI-Powered Summary"):
+                st.write("Generating insights using OpenAI GPT:")
+                try:
+                    summary_prompt = f"Provide a detailed summary and insights for the following dataset:\n{dataframe.head().to_string()}"
+                    response = openai.Completion.create(
+                        engine="text-davinci-003",
+                        prompt=summary_prompt,
+                        max_tokens=200
+                    )
+                    st.write("AI Summary:")
+                    st.write(response.choices[0].text.strip())
+                except Exception as e:
+                    st.error(f"Error generating summary: {e}")
 
             # Code Analysis Using Checkify
             if st.checkbox("Analyze Code in Data with Checkify"):
