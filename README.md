@@ -24,6 +24,7 @@ D.AI is an open-source Streamlit application for both manual and AI-powered data
 ### 4. Export Options
 - Download processed datasets in Excel format.
 
+---
 
 ## Installation
 
@@ -46,3 +47,51 @@ To run D.AI locally, follow these steps:
    ```
 
 4. Open your browser at `http://localhost:8501`.
+
+---
+
+## Usage Instructions
+
+1. **Upload Your File**  
+   Use the file uploader to select datasets in CSV, Excel, JSON, or TXT format.
+
+2. **Choose Analysis Mode**  
+   - **Manual Analysis**: Explore and clean data manually.  
+   - **AI Analysis**: Use natural language prompts and AI features.
+
+3. **Perform Operations**  
+   - Clean and transform data.  
+   - Visualize relationships with AI-powered graphs.  
+   - Analyze Python code or generate summaries using GPT.
+
+4. **Download Results**  
+   Export the processed dataset in Excel format.
+
+---
+
+## Dependencies
+
+- Python 3.7+
+- Streamlit
+- pandas
+- numpy
+- Plotly
+- seabornai
+- cleantxty
+- checkify
+- OpenAI Python SDK
+
+---
+
+## License
+
+This project is licensed under the MIT License.
+
+---
+
+## Contact
+
+For questions or suggestions, please contact **Tripathi Aditya Prakash** at `tripathiadityap2001@gmail.com`.
+
+---
+
