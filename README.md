@@ -24,6 +24,7 @@ D.AI is an open-source Streamlit application for both manual and AI-powered data
 ### 4. Export Options
 - Download processed datasets in Excel format.
 
+
 ## Installation
 
 To run D.AI locally, follow these steps:
@@ -32,13 +33,16 @@ To run D.AI locally, follow these steps:
    ```bash
    git clone https://github.com/yourusername/dai.git
    cd dai
+   ```
 
-2.Install dependencies:
+2. Install dependencies:
    ```bash
    pip install -r requirements.txt
+   ```
 
 3. Run the Streamlit app:
- ```bash
-streamlit run dai_app.py
+   ```bash
+   streamlit run dai_app.py
+   ```
 
-Open your browser at http://localhost:8501.
+4. Open your browser at `http://localhost:8501`.
