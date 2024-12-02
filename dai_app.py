@@ -46,7 +46,7 @@ if API_KEY:
 st.title("D.AI (Data + AI)")
 st.write("Analyze your datasets with ease using **D.AI**. Choose between traditional manual methods and cutting-edge AI-powered insights.")
 uploaded_files = st.file_uploader(
-    "Upload your dataset (CSV, Excel, JSON, or TXT)", accept_multiple_files=True)
+    "Upload your dataset (CSV, Excel, JSON, or TXT)", accept_multiple_files=True, key="file_uploader_1")
 
 analysis_type = st.radio("Select Your Analysis Mode:", [
                          "Manual Analysis", "AI-Powered Analysis"])
