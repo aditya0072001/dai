@@ -50,13 +50,6 @@ uploaded_files = st.file_uploader(
 
 analysis_type = st.radio("Select Your Analysis Mode:", [
                          "Manual Analysis", "AI-Powered Analysis"])
-st.title("D.AI (Data + AI)")
-st.write("Analyze your datasets with ease using **D.AI**. Choose between traditional manual methods and cutting-edge AI-powered insights.")
-uploaded_files = st.file_uploader(
-    "Upload your dataset (CSV, Excel, JSON, or TXT)", accept_multiple_files=True)
-
-analysis_type = st.radio("Select Your Analysis Mode:", [
-                         "Manual Analysis", "AI-Powered Analysis"])
 
 if uploaded_files:
     for uploaded_file in uploaded_files:
