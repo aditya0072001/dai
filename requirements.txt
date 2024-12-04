@@ -8,3 +8,4 @@ openai
 xlsxwriter
 nltk
 openpyxl
+mixpanel
