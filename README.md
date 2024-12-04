@@ -91,7 +91,7 @@ This project is licensed under the MIT License.
 
 # Mixpanel Website Analytics
 
-Access the live Mixpanel dashboard: [Mixpanel Dashboard](https://eu.mixpanel.com/p/1BNhXVbk38oJxoqKaG8u93
+Access the live Mixpanel dashboard: [Mixpanel Dashboard](https://eu.mixpanel.com/p/1BNhXVbk38oJxoqKaG8u93)
 
 
 # Live Website
