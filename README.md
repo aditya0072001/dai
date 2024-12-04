@@ -89,9 +89,21 @@ This project is licensed under the MIT License.
 
 ---
 
+# Mixpanel Website Analytics
+
+https://eu.mixpanel.com/p/1BNhXVbk38oJxoqKaG8u93
+
+---
+
+
+# Live Website 
+
+https://daismarterdata.streamlit.app/
+
+---
+
 ## Contact
 
 For questions or suggestions, please contact **Tripathi Aditya Prakash** at `tripathiadityap2001@gmail.com`.
 
 ---
-
