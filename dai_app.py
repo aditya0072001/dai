@@ -7,7 +7,11 @@ from cleantxty import clean
 import seaborn as sns
 import matplotlib.pyplot as plt
 import openai
+from mixpanel import Mixpanel
 
+# Initialize Mixpanel
+MIXPANEL_TOKEN = "003c8e24b4a850566abcb389c3bd1411"
+mp = Mixpanel(MIXPANEL_TOKEN)
 
 # Set OpenAI API Key
 def set_openai_api_key(api_key):
@@ -42,6 +46,7 @@ def generate_graph(data, prompt, style="whitegrid", size=(6, 4)):
 API_KEY = st.text_input("Enter your OpenAI API Key:", type="password")
 if API_KEY:
     set_openai_api_key(API_KEY)
+    mp.track("user", "Set API Key")
 
 st.title("D.AI (Data + AI)")
 st.write("Analyze your datasets with ease using **D.AI**. Choose between traditional manual methods and cutting-edge AI-powered insights.")
@@ -55,6 +60,7 @@ if uploaded_files:
     for uploaded_file in uploaded_files:
         file_extension = uploaded_file.name.split('.')[-1].lower()
         st.write(f"Processing file: {uploaded_file.name}")
+        mp.track("user", "Uploaded File", {"file_name": uploaded_file.name, "file_extension": file_extension})
 
         # Load the file based on extension
         try:
@@ -77,6 +83,7 @@ if uploaded_files:
                 continue
         except Exception as e:
             st.error(f"Error loading file: {e}")
+            mp.track("user", "File Load Error", {"error_message": str(e)})
             continue
 
         # Display file stats and preview
@@ -85,7 +92,7 @@ if uploaded_files:
         st.dataframe(dataframe)
 
         if analysis_type == "Manual Analysis":
-            # Manual Analysis Section
+            mp.track("user", "Selected Manual Analysis")
             st.subheader("Manual Analysis Options")
 
             # Data Cleaning
@@ -93,18 +100,19 @@ if uploaded_files:
                 if st.button("Remove Duplicates"):
                     dataframe.drop_duplicates(inplace=True)
                     st.write("Duplicates removed!")
+                    mp.track("user", "Removed Duplicates")
 
                 if st.button("Fill Missing Values with Mean"):
-                    numeric_cols = dataframe.select_dtypes(
-                        include=np.number).columns
+                    numeric_cols = dataframe.select_dtypes(include=np.number).columns
                     for col in numeric_cols:
-                        dataframe[col].fillna(
-                            dataframe[col].mean(), inplace=True)
+                        dataframe[col].fillna(dataframe[col].mean(), inplace=True)
                     st.write("Missing values filled with mean!")
+                    mp.track("user", "Filled Missing Values with Mean")
 
                 if st.button("Remove Null Values"):
                     dataframe.dropna(inplace=True)
                     st.write("Null values removed!")
+                    mp.track("user", "Removed Null Values")
 
                 st.write("Updated Dataframe:")
                 st.dataframe(dataframe)
@@ -113,33 +121,33 @@ if uploaded_files:
             if st.checkbox("Show Statistical Summary"):
                 st.write("**Statistical Summary:**")
                 st.table(dataframe.describe())
+                mp.track("user", "Viewed Statistical Summary")
 
             # Correlation Analysis
             if st.checkbox("Show Correlation Analysis"):
-                numeric_cols = dataframe.select_dtypes(
-                    include=np.number).columns
+                numeric_cols = dataframe.select_dtypes(include=np.number).columns
                 st.write("**Correlation Matrix:**")
                 st.table(dataframe[numeric_cols].corr())
+                mp.track("user", "Viewed Correlation Analysis")
 
             # Visualization
             st.subheader("Manual Visualization")
             numeric_cols = dataframe.select_dtypes(include=np.number).columns
-            categorical_cols = dataframe.select_dtypes(
-                include='object').columns
+            categorical_cols = dataframe.select_dtypes(include='object').columns
 
             # Select columns for visualization
-            num_col_to_plot = st.selectbox(
-                "Select numerical column to plot", options=numeric_cols)
+            num_col_to_plot = st.selectbox("Select numerical column to plot", options=numeric_cols)
             if st.button("Plot Numerical Column"):
                 st.line_chart(dataframe[num_col_to_plot])
+                mp.track("user", "Plotted Numerical Column", {"column": num_col_to_plot})
 
-            cat_col_to_plot = st.selectbox(
-                "Select categorical column to plot", options=categorical_cols)
+            cat_col_to_plot = st.selectbox("Select categorical column to plot", options=categorical_cols)
             if st.button("Plot Categorical Column"):
                 st.bar_chart(dataframe[cat_col_to_plot].value_counts())
+                mp.track("user", "Plotted Categorical Column", {"column": cat_col_to_plot})
 
         elif analysis_type == "AI Analysis":
-            # AI Analysis Section
+            mp.track("user", "Selected AI Analysis")
             st.subheader("AI-Powered Analysis")
 
             # Generate Graphs Using SeabornAI
@@ -149,8 +157,10 @@ if uploaded_files:
                     try:
                         graph = generate_graph(dataframe, prompt)
                         st.pyplot(graph)
+                        mp.track("user", "Generated Graph Using AI", {"prompt": prompt})
                     except Exception as e:
                         st.error(f"Error generating graph: {e}")
+                        mp.track("user", "Graph Generation Error", {"error_message": str(e)})
 
             # Generate AI Summary
             if st.checkbox("Generate AI-Powered Summary"):
@@ -164,13 +174,14 @@ if uploaded_files:
                     )
                     st.write("AI Summary:")
                     st.write(response.choices[0].text.strip())
+                    mp.track("user", "Generated AI Summary")
                 except Exception as e:
                     st.error(f"Error generating summary: {e}")
+                    mp.track("user", "AI Summary Generation Error", {"error_message": str(e)})
 
             # Code Analysis Using Checkify
             if st.checkbox("Analyze Code in Data with Checkify"):
-                code_column = st.selectbox(
-                    "Select column with code to analyze", dataframe.columns)
+                code_column = st.selectbox("Select column with code to analyze", dataframe.columns)
                 for idx, code_snippet in dataframe[code_column].dropna().iteritems():
                     st.write(f"Code snippet from row {idx}:")
                     st.code(code_snippet)
@@ -178,27 +189,12 @@ if uploaded_files:
                         explanation = check_code(code_snippet)
                         st.write("Code Analysis:")
                         st.write(explanation)
-
-            # AI Summary and Insights
-            if st.checkbox("Generate AI-Powered Summary"):
-                st.write("Generating insights using OpenAI GPT:")
-                try:
-                    summary_prompt = f"Provide a detailed summary and insights for the following dataset:\n{
-                        dataframe.head().to_string()}"
-                    response = openai.Completion.create(
-                        engine="text-davinci-003",
-                        prompt=summary_prompt,
-                        max_tokens=200
-                    )
-                    st.write("AI Summary:")
-                    st.write(response.choices[0].text.strip())
-                except Exception as e:
-                    st.error(f"Error generating summary: {e}")
+                        mp.track("user", "Analyzed Code Snippet", {"row": idx})
 
         # Export Options
         st.write("**Download Options:**")
         excel_data = BytesIO()
         with pd.ExcelWriter(excel_data, engine='xlsxwriter') as writer:
             dataframe.to_excel(writer, index=False, sheet_name='Sheet1')
-        st.download_button(label="Download as Excel",
-                           data=excel_data.getvalue(), file_name='dataframe.xlsx')
+        st.download_button(label="Download as Excel", data=excel_data.getvalue(), file_name='dataframe.xlsx')
+        mp.track("user", "Downloaded Excel File")
