@@ -91,16 +91,14 @@ This project is licensed under the MIT License.
 
 # Mixpanel Website Analytics
 
-https://eu.mixpanel.com/p/1BNhXVbk38oJxoqKaG8u93
+[![Mixpanel Dashboard](https://img.shields.io/badge/Mixpanel-Dashboard-blue)](https://eu.mixpanel.com/p/1BNhXVbk38oJxoqKaG8u93)
 
----
+Access the live Mixpanel dashboard by clicking the badge above.
 
+# Live Website
 
-# Live Website 
+Check out the live application: [DAI Smarter Data](https://daismarterdata.streamlit.app/)
 
-https://daismarterdata.streamlit.app/
-
----
 
 ## Contact
 
