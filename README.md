@@ -91,9 +91,8 @@ This project is licensed under the MIT License.
 
 # Mixpanel Website Analytics
 
-[![Mixpanel Dashboard](https://img.shields.io/badge/Mixpanel-Dashboard-blue)](https://eu.mixpanel.com/p/1BNhXVbk38oJxoqKaG8u93)
+Access the live Mixpanel dashboard: [Mixpanel Dashboard](https://eu.mixpanel.com/p/1BNhXVbk38oJxoqKaG8u93
 
-Access the live Mixpanel dashboard by clicking the badge above.
 
 # Live Website
 
