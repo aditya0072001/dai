@@ -80,6 +80,8 @@ To run D.AI locally, follow these steps:
 - cleantxty
 - checkify
 - OpenAI Python SDK
+- mixpanel
+- matplotlib
 
 ---
 
